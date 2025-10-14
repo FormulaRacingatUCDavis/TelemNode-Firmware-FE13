@@ -49,8 +49,6 @@ extern "C" {
 
 /* USER CODE END EM */
 
-void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
-
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
@@ -59,26 +57,30 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define TEMP_INLET_Pin GPIO_PIN_0
-#define TEMP_INLET_GPIO_Port GPIOA
-#define TEMP_AIR_IN_Pin GPIO_PIN_1
-#define TEMP_AIR_IN_GPIO_Port GPIOA
-#define TEMP_OUTLET_Pin GPIO_PIN_2
-#define TEMP_OUTLET_GPIO_Port GPIOA
-#define TEMP_AIR_OUT_Pin GPIO_PIN_3
-#define TEMP_AIR_OUT_GPIO_Port GPIOA
-#define PRES_INLET_Pin GPIO_PIN_4
-#define PRES_INLET_GPIO_Port GPIOA
-#define PRES_OUTLET_Pin GPIO_PIN_5
-#define PRES_OUTLET_GPIO_Port GPIOA
-#define TOE_STRAIN_GAUGE_Pin GPIO_PIN_6
-#define TOE_STRAIN_GAUGE_GPIO_Port GPIOA
-#define AARM_STRAIN_GAUGE_Pin GPIO_PIN_7
-#define AARM_STRAIN_GAUGE_GPIO_Port GPIOA
-#define PWM_PUMP_Pin GPIO_PIN_9
-#define PWM_PUMP_GPIO_Port GPIOA
-#define BUZZER_Pin GPIO_PIN_10
-#define BUZZER_GPIO_Port GPIOA
+#define EXTRA_SENSOR_Pin GPIO_PIN_0
+#define EXTRA_SENSOR_GPIO_Port GPIOA
+#define STRAIN_GAUGE_CONTROL_Pin GPIO_PIN_1
+#define STRAIN_GAUGE_CONTROL_GPIO_Port GPIOA
+#define SHOCK_ANGLE_Pin GPIO_PIN_2
+#define SHOCK_ANGLE_GPIO_Port GPIOA
+#define STRAIN_GAUGE_UF_Pin GPIO_PIN_3
+#define STRAIN_GAUGE_UF_GPIO_Port GPIOA
+#define STRAIN_GAUGE_UB_Pin GPIO_PIN_4
+#define STRAIN_GAUGE_UB_GPIO_Port GPIOA
+#define STRAIN_GAUGE_LF_Pin GPIO_PIN_5
+#define STRAIN_GAUGE_LF_GPIO_Port GPIOA
+#define STRAIN_GAUGE_LB_Pin GPIO_PIN_6
+#define STRAIN_GAUGE_LB_GPIO_Port GPIOA
+#define IR_BRAKE_TEMP_Pin GPIO_PIN_7
+#define IR_BRAKE_TEMP_GPIO_Port GPIOA
+#define K_BRAKE_TEMP_Pin GPIO_PIN_0
+#define K_BRAKE_TEMP_GPIO_Port GPIOB
+#define STRAIN_GAUGE_PUSH_Pin GPIO_PIN_1
+#define STRAIN_GAUGE_PUSH_GPIO_Port GPIOB
+#define HEARTBEAT_Pin GPIO_PIN_12
+#define HEARTBEAT_GPIO_Port GPIOB
+#define WHEEL_SPEED_Pin GPIO_PIN_8
+#define WHEEL_SPEED_GPIO_Port GPIOA
 #define WHEEL_1_Pin GPIO_PIN_4
 #define WHEEL_1_GPIO_Port GPIOB
 #define WHEEL_0_Pin GPIO_PIN_6

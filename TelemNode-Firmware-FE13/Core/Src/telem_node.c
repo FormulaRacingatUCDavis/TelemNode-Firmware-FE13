@@ -252,6 +252,7 @@ void buzzerer()
 	last_vcu_state = can_data.vcu_state;
 }
 
+// TODO dont use interrupts, see FE11-12 Dashboard code (use TIM)
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	switch(GPIO_Pin){
 		case GPIO_PIN_4:
