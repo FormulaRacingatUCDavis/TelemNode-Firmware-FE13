@@ -1,0 +1,9 @@
+../Core/Src/telem_node.c:54:6:TelemNode_Init	16	static
+../Core/Src/telem_node.c:78:6:TelemNode_Update	32	static
+../Core/Src/telem_node.c:150:6:update_pwm	16	static
+../Core/Src/telem_node.c:199:10:get_pres	24	static
+../Core/Src/telem_node.c:208:9:get_temp	24	static
+../Core/Src/telem_node.c:215:9:get_air_temp	40	static
+../Core/Src/telem_node.c:222:6:set_pump_speed	16	static
+../Core/Src/telem_node.c:227:6:set_fan_speed	16	static
+../Core/Src/telem_node.c:256:6:HAL_GPIO_EXTI_Callback	16	static
