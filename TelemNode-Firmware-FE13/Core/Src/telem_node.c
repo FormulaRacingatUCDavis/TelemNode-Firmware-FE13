@@ -80,7 +80,7 @@ void TelemNode_Update()
 	static uint8_t loop_count = 0;
 	static uint8_t tx_data[8];
 
-	buzzerer();
+//	buzzerer();
 //	HAL_Delay(LOOP_PERIOD_MS);
 
 	loop_count++;
@@ -229,28 +229,28 @@ void set_fan_speed(uint8_t speed)
 	PWM_SetDutyCycle(&pwm_fan, speed);
 }
 
-void buzzerer()
-{
-	static VCU_STATE_t last_vcu_state = LV;
-	static uint32_t buzz_start = 0;
-	uint32_t tick = HAL_GetTick();
-
-	if(last_vcu_state == HV_ENABLED && can_data.vcu_state == DRIVE)
-	{
-		HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, 1); // turn on buzzer
-		buzz_start = tick;
-	}
-	else if(can_data.vcu_state != DRIVE || (tick - buzz_start) > BUZZ_TIME_MS)
-	{
-		HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, 0); // turn off buzzer
-	}
-	else
-	{
-		// ice cream?
-	}
-
-	last_vcu_state = can_data.vcu_state;
-}
+//void buzzerer()
+//{
+//	static VCU_STATE_t last_vcu_state = LV;
+//	static uint32_t buzz_start = 0;
+//	uint32_t tick = HAL_GetTick();
+//
+//	if(last_vcu_state == HV_ENABLED && can_data.vcu_state == DRIVE)
+//	{
+//		HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, 1); // turn on buzzer
+//		buzz_start = tick;
+//	}
+//	else if(can_data.vcu_state != DRIVE || (tick - buzz_start) > BUZZ_TIME_MS)
+//	{
+//		HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, 0); // turn off buzzer
+//	}
+//	else
+//	{
+//		// ice cream?
+//	}
+//
+//	last_vcu_state = can_data.vcu_state;
+//}
 
 // TODO dont use interrupts, see FE11-12 Dashboard code (use TIM)
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
