@@ -22,7 +22,7 @@ uint32_t WheelSpeed_GetCPS(WheelSpeed_t* ws)
 
 	// prevent divide by 0
 	if(dif == 0) dif = 1;
-
+	//cps = cycles per second
 	uint32_t cps = 1000 * (ws->count - ws->last_count) / dif;
 
 	ws->last_count = ws->count;

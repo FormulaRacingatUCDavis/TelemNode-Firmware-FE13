@@ -17,12 +17,16 @@
 #define FAN_THRESH_2 500
 #define FAN_THRESH_3 600
 #define HYSTERESIS 30
+//might change this number later
+#define NUM_SAMPLES_IN_AVGERAGE 5
 
 // HANDLE TYPE DEFS from main
 extern ADC_HandleTypeDef hadc1;
 extern TIM_HandleTypeDef htim1;
 
 extern CAN_DATA_t can_data;
+//extern allows this file to use this var
+extern unit32_t ADC_RES_BUFFER[9];
 
 // PRIVATE GLOBALS
 ADC_Input_t adc_inlet_temp;
@@ -42,10 +46,51 @@ WheelSpeed_t wheel_rr;
 WheelSpeed_t wheel_rl;
 
 
+//keep track of number of samples taken so far
+uint8_t num_samples;
+
+
+//vars used to calculate avg
+uint64_t strain_gauge_control_avg =0;
+uint64_t shock_angle_avg =0;
+uint64_t strain_gauge_uf_avg=0;
+uint64_t strain_gauge_ub_avg=0;
+uint64_t strain_gauge_lf_avg=0;
+uint64_t strain_gauge_lb_avg=0;
+uint64_t ir_brake_temp_avg=0;
+uint64_t k_brake_temp_avg=0;
+uint64_t strain_gauge_push_avg=0;
+
+//vars to store the current avg
+//will we be using this current avg anywhere else outside of HAL_ADC_ConvCpltCallback
+uint64_t strain_gauge_control_curr_avg = 0;
+uint64_t shock_angle_curr_avg =0;
+uint64_t strain_gauge_uf_curr_avg=0;
+uint64_t strain_gauge_ub_curr_avg=0;
+uint64_t strain_gauge_lf_curr_avg=0;
+uint64_t strain_gauge_lb_curr_avg=0;
+uint64_t ir_brake_temp_curr_avg=0;
+uint64_t k_brake_temp_curr_avg=0;
+uint64_t strain_gauge_push_curr_avg=0;
+
+
+
+
 // PRIVATE FUNCTION PROTOTYPES
 uint16_t get_pres(uint16_t adc_val);
 int16_t get_temp(uint16_t adc_val);
 int16_t get_air_temp(uint16_t adc_val);
+//added this
+uint16_t get_strain_gauge_control(uint16_t adc_val);
+uint16_t get_shock_angle(uint16_t adc_val);
+uint16_t get_straing_gauge_uf(uint16_t adc_val);
+uint16_t get_straing_gauge_ub(uint16_t adc_val);
+uint16_t get_straing_gauge_lf(uint16_t adc_val);
+uint16_t get_straing_gauge_lb(uint16_t adc_val);
+uint16_t get_ir_brake_temp(uint16_t adc_val);
+uint16_t get_k_brake_temp(uint16_t adc_val);
+uint16_t get_strain_gauge_push(uint16_t adc_val);
+
 void set_fan_speed(uint8_t speed);
 void set_pump_speed(uint8_t speed);
 void update_pwm(int16_t inlet_temp);
@@ -73,6 +118,108 @@ void TelemNode_Init(){
 
 	set_pump_speed(255);
 	set_fan_speed(128);
+}
+
+//added this
+//TODO moving converted data into where we need them to be
+	//send the sensor data to the right place
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
+	//creating array, b/c it will used for CANsend
+	static uint8_t tx_data[8];
+
+	if( num_samples == 0){
+	//reading the first set of samples & assigning to the correct variable
+	strain_gauge_control_avg = ADC_RES_BUFFER[0];
+	shock_angle_avg = ADC_RES_BUFFER[1];
+	strain_gauge_uf_avg = ADC_RES_BUFFER[2];
+	strain_gauge_ub_avg = ADC_RES_BUFFER[3];
+	strain_gauge_lf_avg = ADC_RES_BUFFER[4];
+	strain_guage_lb_avg = ADC_RES_BUFFER[5];
+	ir_brake_temp_avg = ADC_RES_BUFFER[6];
+	k_brake_temp_avg = ADC_RES_BUFFER[7];
+	strain_gauge_push_avg = ADC_RES_BUFFER[8];
+
+	++num_samples;
+
+	}
+	else if (num_samples < NUM_SAMPLES_IN_AVGERAGE){
+		//calculating average for each sensor
+		//equation for new average = old average * (n-1)/n + new value/n
+		//++num_samples must be done first, because it will cause funky numbers if done otherwise
+		++num_samples;
+		strain_gauge_control_avg = strain_gauge_control_avg * (num_samples-1)/num_samples +  ADC_RES_BUFFER[0]/num_samples;
+		shock_angle_avg = shock_angle_avg * (num_samples -1)/num_samples + ADC_RES_BUFFER[1]/num_samples;
+		strain_gauge_uf_avg = strain_gauge_uf_avg * (num_samples - 1) / num_samples + ADC_RES_BUFFER[2] / num_samples;
+		strain_gauge_ub_avg = strain_gauge_ub_avg * (num_samples - 1) / num_samples + ADC_RES_BUFFER[3] / num_samples;
+		strain_gauge_lf_avg = strain_gauge_lf_avg * (num_samples - 1) / num_samples + ADC_RES_BUFFER[4] / num_samples;
+		strain_gauge_lb_avg = strain_gauge_lb_avg * (num_samples - 1) / num_samples + ADC_RES_BUFFER[5] / num_samples;
+		ir_brake_temp_avg = ir_brake_temp_avg * (num_samples - 1) / num_samples + ADC_RES_BUFFER[6] / num_samples;
+		k_brake_temp_avg = k_brake_temp_avg * (num_samples - 1) / num_samples + ADC_RES_BUFFER[7] / num_samples;
+		strain_gauge_push_avg = strain_gauge_push_avg * (num_samples - 1) / num_samples + ADC_RES_BUFFER[8] / num_samples;
+
+	}
+	else{
+
+		//Need to get the "right" form of ADC number, b/c CAN uses 16  aka 2 bytes
+		//will need to define the get f(x) for strain gauge since it will put the ADC number in the form we need
+		uint16_t strain_gauge_control;
+		uint16_t shock_angle;
+		uint16_t strain_gauge_uf;
+		uint16_t strain_gauge_ub;
+		uint16_t strain_gauge_lf;
+		uint16_t strain_gauge_lb;
+		uint16_t ir_brake_temp;
+		uint16_t k_brake_temp;
+		uint16_t strain_gauge_push;
+
+
+
+		//set the data into the tx_data array
+		//Can do 4 variables at a time, so will need to assign in groups
+		txt_data[0]= HI8(strain_gauge_control);
+		txt_data[1]= LO8(strain_gauge_control);
+		txt_data[2]= HI8(shock_angle);
+		txt_data[3]= LO8(shock_angle);
+		txt_data[4]= HI8(strain_gauge_uf);
+		txt_data[5]= LO8(strain_gauge_uf);
+		txt_data[6]= HI8(strain_gauge_ub);
+		txt_data[7]= LO8(strain_gauge_ub);
+		//call CANsend here
+
+		//then overwrite txt_data with the next 4 variables:
+			//strain_gauge_lf;
+			//strain_gauge_lb;
+			//ir_brake_temp;
+			//k_brake_temp;
+		//then call CANsend here
+
+		//Lastly overwrite txt_data with the last variable:
+			//strain_gauge_push
+		//then call CANsend
+
+		//save most recent average to current average, might use it somewhere else?
+		strain_gauge_control_curr_avg = strain_gauge_control_avg;
+		shock_angle_curr_avg = shock_angle_avg;
+		strain_gauge_uf_curr_avg= strain_gauge_uf_avg;
+		strain_gauge_ub_curr_avg= strain_gauge_ub_avg;
+		strain_gauge_lf_curr_avg= strain_gauge_lf_avg;
+		strain_gauge_lb_curr_avg= strain_gauge_lb_avg;
+		ir_brake_temp_curr_avg= ir_brake_temp_avg;
+		k_brake_temp_curr_avg= k_brake_temp_avg;
+		strain_gauge_push_curr_avg= strain_gauge_push_avg;
+
+		//reset the average, so that next set of calculations won't have any errors
+		strain_gauge_control_avg =0;
+		shock_angle_avg =0;
+		strain_gauge_uf_avg=0;
+		strain_gauge_ub_avg=0;
+		strain_gauge_lf_avg=0;
+		strain_gauge_lb_avg=0;
+		ir_brake_temp_avg=0;
+		k_brake_temp_avg=0;
+		strain_gauge_push_avg=0;
+
+	}
 }
 
 void TelemNode_Update()
@@ -217,6 +364,19 @@ int16_t get_air_temp(uint16_t adc_val)
 	float temp = 83.35412 - 0.03634221 * adc_val +0.0000034466 * adc_val * adc_val;
 	return (int16_t) (temp *10);
 }
+
+uint16_t get_strain_gauge_control(uint16_t adc_val){}
+uint16_t get_shock_angle(uint16_t adc_val){}
+uint16_t get_straing_gauge_uf(uint16_t adc_val){}
+uint16_t get_straing_gauge_ub(uint16_t adc_val){}
+uint16_t get_straing_gauge_lf(uint16_t adc_val){}
+uint16_t get_straing_gauge_lb(uint16_t adc_val){}
+uint16_t get_ir_brake_temp(uint16_t adc_val){}
+uint16_t get_k_brake_temp(uint16_t adc_val){}
+uint16_t get_strain_gauge_push(uint16_t adc_val){}
+
+
+
 
 
 void set_pump_speed(uint8_t speed)
