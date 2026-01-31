@@ -50,7 +50,7 @@ typedef enum{
 } TCAN_ID;
 
 typedef enum {
-	FL, FR, BL, BR,
+	FL, FR, RL, RR,
 } TelemNodeLocation_t;
 
 typedef enum {

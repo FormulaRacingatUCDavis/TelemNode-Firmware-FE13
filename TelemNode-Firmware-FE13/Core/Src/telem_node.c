@@ -186,16 +186,16 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 		//call CANsend here
 		switch (Location) {
 			case (FL):
-				CANSend(SG_UPPERLOWER_FL, txt_data, 8);
+				CAN_Send(SG_UPPERLOWER_FL, txt_data, 8);
 				break;
 			case (FR):
-				CANSend(SG_UPPERLOWER_FR, txt_data, 8);
+				CAN_Send(SG_UPPERLOWER_FR, txt_data, 8);
 				break;
-			case (BL):
-				CANSend(SG_UPPERLOWER_RL, txt_data, 8);
+			case (RL):
+				CAN_Send(SG_UPPERLOWER_RL, txt_data, 8);
 				break;
-			case (BR):
-				CANSend(SG_UPPERLOWER_RR, txt_data, 8);
+			case (RR):
+				CAN_Send(SG_UPPERLOWER_RR, txt_data, 8);
 				break;
 
 		}
@@ -212,16 +212,16 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 		//then call CANsend here
 		switch (Location) {
 			case (FL):
-				CANSend(SG_CONTROLSHOCK_FL, txt_data, 6);
+				CAN_Send(SG_CONTROLSHOCK_FL, txt_data, 6);
 				break;
 			case (FR):
-				CANSend(SG_CONTROLSHOCK_FR, txt_data, 6);
+				CAN_Send(SG_CONTROLSHOCK_FR, txt_data, 6);
 				break;
-			case (BL):
-				CANSend(SG_CONTROLSHOCK_RL, txt_data, 6);
+			case (RL):
+				CAN_Send(SG_CONTROLSHOCK_RL, txt_data, 6);
 				break;
-			case (BR):
-				CANSend(SG_CONTROLSHOCK_RR, txt_data, 6);
+			case (RR):
+				CAN_Send(SG_CONTROLSHOCK_RR, txt_data, 6);
 				break;
 
 		}
@@ -234,16 +234,16 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 		//then call CANsend
 		switch (Location) {
 			case (FL):
-				CANSend(BRAKE_TEMP_FL, txt_data, 4);
+				CAN_Send(BRAKE_TEMP_FL, txt_data, 4);
 				break;
 			case (FR):
-				CANSend(BRAKE_TEMP_FR, txt_data, 4);
+				CAN_Send(BRAKE_TEMP_FR, txt_data, 4);
 				break;
-			case (BL):
-				CANSend(BRAKE_TEMP_RL, txt_data, 4);
+			case (RL):
+				CAN_Send(BRAKE_TEMP_RL, txt_data, 4);
 				break;
-			case (BR):
-				CANSend(BRAKE_TEMP_RR, txt_data, 4);
+			case (RR):
+				CAN_Send(BRAKE_TEMP_RR, txt_data, 4);
 				break;
 
 		}
