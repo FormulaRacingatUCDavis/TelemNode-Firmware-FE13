@@ -1,0 +1,2 @@
+../Core/Src/wheel_speed.c:11:6:WheelSpeed_Init	1
+../Core/Src/wheel_speed.c:18:10:WheelSpeed_GetCPS	2
