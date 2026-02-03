@@ -110,7 +110,7 @@ int main(void)
   //ADDED this as well
   //signaling the start of the conversion
   //9 bc we have 9 channels
-  HAL_ADC_START_DMA(&hadc1, ADC_RES_BUFFER, 9);
+  HAL_ADC_Start_DMA(&hadc1, ADC_RES_BUFFER, 9);
   TelemNode_Init();
 
 

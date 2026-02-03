@@ -53,6 +53,7 @@ typedef enum {
 	FL, FR, RL, RR,
 } TelemNodeLocation_t;
 
+
 typedef enum {
     LV,
     PRECHARGING,

@@ -20,7 +20,7 @@
 //might change this number later
 #define NUM_SAMPLES_IN_AVGERAGE 5
 
-extern TelemNodeLocation_t Location;
+TelemNodeLocation_t Location = FL;
 
 // HANDLE TYPE DEFS from main
 extern ADC_HandleTypeDef hadc1;
@@ -28,7 +28,7 @@ extern TIM_HandleTypeDef htim1;
 
 extern CAN_DATA_t can_data;
 //extern allows this file to use this var
-extern unit32_t ADC_RES_BUFFER[9];
+extern uint32_t ADC_RES_BUFFER[9];
 
 // PRIVATE GLOBALS
 ADC_Input_t adc_inlet_temp;
@@ -83,15 +83,15 @@ uint16_t get_pres(uint16_t adc_val);
 int16_t get_temp(uint16_t adc_val);
 int16_t get_air_temp(uint16_t adc_val);
 //added this
-uint16_t get_strain_gauge_control(uint16_t adc_val);
-uint16_t get_shock_angle(uint16_t adc_val);
-uint16_t get_straing_gauge_uf(uint16_t adc_val);
-uint16_t get_straing_gauge_ub(uint16_t adc_val);
-uint16_t get_straing_gauge_lf(uint16_t adc_val);
-uint16_t get_straing_gauge_lb(uint16_t adc_val);
-uint16_t get_ir_brake_temp(uint16_t adc_val);
-uint16_t get_k_brake_temp(uint16_t adc_val);
-uint16_t get_strain_gauge_push(uint16_t adc_val);
+//uint16_t get_strain_gauge_control(uint16_t adc_val);
+//uint16_t get_shock_angle(uint16_t adc_val);
+//uint16_t get_straing_gauge_uf(uint16_t adc_val);
+//uint16_t get_straing_gauge_ub(uint16_t adc_val);
+//uint16_t get_straing_gauge_lf(uint16_t adc_val);
+//uint16_t get_straing_gauge_lb(uint16_t adc_val);
+//uint16_t get_ir_brake_temp(uint16_t adc_val);
+//uint16_t get_k_brake_temp(uint16_t adc_val);
+//uint16_t get_strain_gauge_push(uint16_t adc_val);
 
 void set_fan_speed(uint8_t speed);
 void set_pump_speed(uint8_t speed);
@@ -136,7 +136,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 	strain_gauge_uf_avg = ADC_RES_BUFFER[2];
 	strain_gauge_ub_avg = ADC_RES_BUFFER[3];
 	strain_gauge_lf_avg = ADC_RES_BUFFER[4];
-	strain_guage_lb_avg = ADC_RES_BUFFER[5];
+	strain_gauge_lb_avg = ADC_RES_BUFFER[5];
 	ir_brake_temp_avg = ADC_RES_BUFFER[6];
 	k_brake_temp_avg = ADC_RES_BUFFER[7];
 	strain_gauge_push_avg = ADC_RES_BUFFER[8];
@@ -175,75 +175,75 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 
 
 		//set the strain gauge UL data into the tx_data array
-		txt_data[0]= HI8(strain_gauge_uf);
-		txt_data[1]= LO8(strain_gauge_uf);
-		txt_data[2]= HI8(strain_gauge_ub);
-		txt_data[3]= LO8(strain_gauge_ub);
-		txt_data[4]= HI8(strain_gauge_lf);
-		txt_data[5]= LO8(strain_gauge_lf);
-		txt_data[6]= HI8(strain_gauge_lb);
-		txt_data[7]= LO8(strain_gauge_lb);
+		tx_data[0]= HI8(strain_gauge_uf);
+		tx_data[1]= LO8(strain_gauge_uf);
+		tx_data[2]= HI8(strain_gauge_ub);
+		tx_data[3]= LO8(strain_gauge_ub);
+		tx_data[4]= HI8(strain_gauge_lf);
+		tx_data[5]= LO8(strain_gauge_lf);
+		tx_data[6]= HI8(strain_gauge_lb);
+		tx_data[7]= LO8(strain_gauge_lb);
 		//call CANsend here
 		switch (Location) {
 			case (FL):
-				CAN_Send(SG_UPPERLOWER_FL, txt_data, 8);
+				CAN_Send(SG_UPPERLOWER_FL, tx_data, 8);
 				break;
 			case (FR):
-				CAN_Send(SG_UPPERLOWER_FR, txt_data, 8);
+				CAN_Send(SG_UPPERLOWER_FR, tx_data, 8);
 				break;
 			case (RL):
-				CAN_Send(SG_UPPERLOWER_RL, txt_data, 8);
+				CAN_Send(SG_UPPERLOWER_RL, tx_data, 8);
 				break;
 			case (RR):
-				CAN_Send(SG_UPPERLOWER_RR, txt_data, 8);
+				CAN_Send(SG_UPPERLOWER_RR, tx_data, 8);
 				break;
 
 		}
 
 
 
-		//then overwrite txt_data with control, push, and shock angle
-		txt_data[0]= HI8(strain_gauge_control);
-		txt_data[1]= LO8(strain_gauge_control);
-		txt_data[2]= HI8(strain_gauge_push);
-		txt_data[3]= LO8(strain_gauge_push);
-		txt_data[4]= HI8(shock_angle);
-		txt_data[5]= LO8(shock_angle);
+		//then overwrite tx_data with control, push, and shock angle
+		tx_data[0]= HI8(strain_gauge_control);
+		tx_data[1]= LO8(strain_gauge_control);
+		tx_data[2]= HI8(strain_gauge_push);
+		tx_data[3]= LO8(strain_gauge_push);
+		tx_data[4]= HI8(shock_angle);
+		tx_data[5]= LO8(shock_angle);
 		//then call CANsend here
 		switch (Location) {
 			case (FL):
-				CAN_Send(SG_CONTROLSHOCK_FL, txt_data, 6);
+				CAN_Send(SG_CONTROLSHOCK_FL, tx_data, 6);
 				break;
 			case (FR):
-				CAN_Send(SG_CONTROLSHOCK_FR, txt_data, 6);
+				CAN_Send(SG_CONTROLSHOCK_FR, tx_data, 6);
 				break;
 			case (RL):
-				CAN_Send(SG_CONTROLSHOCK_RL, txt_data, 6);
+				CAN_Send(SG_CONTROLSHOCK_RL, tx_data, 6);
 				break;
 			case (RR):
-				CAN_Send(SG_CONTROLSHOCK_RR, txt_data, 6);
+				CAN_Send(SG_CONTROLSHOCK_RR, tx_data, 6);
 				break;
 
 		}
 
 		//Lastly overwrite with brake temp data
-		txt_data[0]= HI8(ir_brake_temp);
-		txt_data[1]= LO8(ir_brake_temp);
-		txt_data[2]= HI8(k_brake_temp);
-		txt_data[3]= LO8(k_brake_temp);
+		tx_data[0]= HI8(ir_brake_temp);
+		tx_data[1]= LO8(ir_brake_temp);
+		tx_data[2]= HI8(k_brake_temp);
+		tx_data[3]= LO8(k_brake_temp);
 		//then call CANsend
 		switch (Location) {
 			case (FL):
-				CAN_Send(BRAKE_TEMP_FL, txt_data, 4);
+				CAN_Send(BRAKE_TEMP_FL, tx_data, 4);
 				break;
 			case (FR):
-				CAN_Send(BRAKE_TEMP_FR, txt_data, 4);
+				CAN_Send(BRAKE_TEMP_FR, tx_data, 4);
 				break;
 			case (RL):
-				CAN_Send(BRAKE_TEMP_RL, txt_data, 4);
+				CAN_Send(BRAKE_TEMP_RL, tx_data, 4);
 				break;
 			case (RR):
-				CAN_Send(BRAKE_TEMP_RR, txt_data, 4);
+				CAN_Send(BRAKE_TEMP_RR, tx_data, 4);
 				break;
 
 		}
@@ -261,15 +261,15 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 		strain_gauge_push_curr_avg= strain_gauge_push_avg;
 
 		//reset the average, so that next set of calculations won't have any errors
-		strain_gauge_control_avg =0;
-		shock_angle_avg =0;
-		strain_gauge_uf_avg=0;
-		strain_gauge_ub_avg=0;
-		strain_gauge_lf_avg=0;
-		strain_gauge_lb_avg=0;
-		ir_brake_temp_avg=0;
-		k_brake_temp_avg=0;
-		strain_gauge_push_avg=0;
+		strain_gauge_control_avg = 0;
+		shock_angle_avg = 0;
+		strain_gauge_uf_avg = 0;
+		strain_gauge_ub_avg = 0;
+		strain_gauge_lf_avg = 0;
+		strain_gauge_lb_avg = 0;
+		ir_brake_temp_avg= 0;
+		k_brake_temp_avg = 0;
+		strain_gauge_push_avg = 0;
 
 	}
 }
@@ -417,14 +417,18 @@ int16_t get_air_temp(uint16_t adc_val)
 	return (int16_t) (temp *10);
 }
 
-uint16_t get_strain_gauge_val(uint16_t adc_val){
+uint16_t get_strain_gauge_val(uint64_t adc_val){
 	return (uint16_t)(adc_val * 0.001268);
 }
-uint16_t get_shock_angle(uint16_t adc_val){
-	return (uint16_t)(adc_val * 0.001268);
+uint16_t get_shock_angle(uint64_t adc_val){
+	return (uint16_t)(adc_val); // TODO FIX ME
 }
-uint16_t get_ir_brake_temp(uint16_t adc_val){}
-uint16_t get_k_brake_temp(uint16_t adc_val){}
+uint16_t get_ir_brake_temp(uint64_t adc_val){
+	return (uint16_t)adc_val; // TODO FIX ME YAAA
+}
+uint16_t get_k_brake_temp(uint64_t adc_val){
+	return (uint16_t)adc_val; // TODO FIX
+}
 
 
 
