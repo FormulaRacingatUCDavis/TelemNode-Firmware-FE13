@@ -47,10 +47,7 @@ PWM_Output_t pwm_pump;
 WheelSpeed_t wheel_rr;
 WheelSpeed_t wheel_rl;
 
-
-//keep track of number of samples taken so far
-uint8_t num_samples;
-
+uint8_t num_samples = 0;
 
 //vars used to calculate avg
 uint64_t strain_gauge_control_avg =0;
@@ -75,24 +72,21 @@ uint64_t ir_brake_temp_curr_avg=0;
 uint64_t k_brake_temp_curr_avg=0;
 uint64_t strain_gauge_push_curr_avg=0;
 
-
-
+uint16_t sg_control_buf[5];
+uint16_t sg_uf_buf[5];
+uint16_t sg_ub_buf[5];
+uint16_t sg_lf_buf[5];
+uint16_t sg_lb_buf[5];
+uint16_t shock_ang_buf[5];
+uint16_t sg_push_buf[5];
+uint16_t ir_brake_buf[5];
+uint16_t k_brake_buf[5];
+uint8_t ready_to_send = 0;
 
 // PRIVATE FUNCTION PROTOTYPES
 uint16_t get_pres(uint16_t adc_val);
 int16_t get_temp(uint16_t adc_val);
 int16_t get_air_temp(uint16_t adc_val);
-//added this
-//uint16_t get_strain_gauge_control(uint16_t adc_val);
-//uint16_t get_shock_angle(uint16_t adc_val);
-//uint16_t get_straing_gauge_uf(uint16_t adc_val);
-//uint16_t get_straing_gauge_ub(uint16_t adc_val);
-//uint16_t get_straing_gauge_lf(uint16_t adc_val);
-//uint16_t get_straing_gauge_lb(uint16_t adc_val);
-//uint16_t get_ir_brake_temp(uint16_t adc_val);
-//uint16_t get_k_brake_temp(uint16_t adc_val);
-//uint16_t get_strain_gauge_push(uint16_t adc_val);
-
 void set_fan_speed(uint8_t speed);
 void set_pump_speed(uint8_t speed);
 void update_pwm(int16_t inlet_temp);
@@ -122,45 +116,18 @@ void TelemNode_Init(){
 	set_fan_speed(128);
 }
 
-//added this
-//TODO moving converted data into where we need them to be
-	//send the sensor data to the right place
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
-	//creating array, b/c it will used for CANsend
+void Process_Average(){
 	static uint8_t tx_data[8];
-
-	if( num_samples == 0){
-	//reading the first set of samples & assigning to the correct variable
-	strain_gauge_control_avg = ADC_RES_BUFFER[0];
-	shock_angle_avg = ADC_RES_BUFFER[1];
-	strain_gauge_uf_avg = ADC_RES_BUFFER[2];
-	strain_gauge_ub_avg = ADC_RES_BUFFER[3];
-	strain_gauge_lf_avg = ADC_RES_BUFFER[4];
-	strain_gauge_lb_avg = ADC_RES_BUFFER[5];
-	ir_brake_temp_avg = ADC_RES_BUFFER[6];
-	k_brake_temp_avg = ADC_RES_BUFFER[7];
-	strain_gauge_push_avg = ADC_RES_BUFFER[8];
-
-	++num_samples;
-
-	}
-	else if (num_samples < NUM_SAMPLES_IN_AVGERAGE){
-		//calculating average for each sensor
-		//equation for new average = old average * (n-1)/n + new value/n
-		//++num_samples must be done first, because it will cause funky numbers if done otherwise
-		++num_samples;
-		strain_gauge_control_avg = strain_gauge_control_avg * (num_samples-1)/num_samples +  ADC_RES_BUFFER[0]/num_samples;
-		shock_angle_avg = shock_angle_avg * (num_samples -1)/num_samples + ADC_RES_BUFFER[1]/num_samples;
-		strain_gauge_uf_avg = strain_gauge_uf_avg * (num_samples - 1) / num_samples + ADC_RES_BUFFER[2] / num_samples;
-		strain_gauge_ub_avg = strain_gauge_ub_avg * (num_samples - 1) / num_samples + ADC_RES_BUFFER[3] / num_samples;
-		strain_gauge_lf_avg = strain_gauge_lf_avg * (num_samples - 1) / num_samples + ADC_RES_BUFFER[4] / num_samples;
-		strain_gauge_lb_avg = strain_gauge_lb_avg * (num_samples - 1) / num_samples + ADC_RES_BUFFER[5] / num_samples;
-		ir_brake_temp_avg = ir_brake_temp_avg * (num_samples - 1) / num_samples + ADC_RES_BUFFER[6] / num_samples;
-		k_brake_temp_avg = k_brake_temp_avg * (num_samples - 1) / num_samples + ADC_RES_BUFFER[7] / num_samples;
-		strain_gauge_push_avg = strain_gauge_push_avg * (num_samples - 1) / num_samples + ADC_RES_BUFFER[8] / num_samples;
-
-	}
-	else{
+	if(ready_to_send){
+		strain_gauge_control_avg = (sg_control_buf[0] + sg_control_buf[1] + sg_control_buf[2] + sg_control_buf[3] + sg_control_buf[4]) / 5;
+		shock_angle_avg = (shock_ang_buf[0] + shock_ang_buf[1] + shock_ang_buf[2] + shock_ang_buf[3] + shock_ang_buf[4]) / 5;
+		strain_gauge_uf_avg = (sg_uf_buf[0] + sg_uf_buf[1] + sg_uf_buf[2] + sg_uf_buf[3] + sg_uf_buf[4]) / 5;
+		strain_gauge_ub_avg = (sg_ub_buf[0] + sg_ub_buf[1] + sg_ub_buf[2] + sg_ub_buf[3] + sg_ub_buf[4]) / 5;
+		strain_gauge_lf_avg = (sg_lf_buf[0] + sg_lf_buf[1] + sg_lf_buf[2] + sg_lf_buf[3] + sg_lf_buf[4]) / 5;
+		strain_gauge_lb_avg = (sg_lb_buf[0] + sg_lb_buf[1] + sg_lb_buf[2] + sg_lb_buf[3] + sg_lb_buf[4]) / 5;
+		ir_brake_temp_avg = (ir_brake_buf[0] + ir_brake_buf[1] + ir_brake_buf[2] + ir_brake_buf[3] + ir_brake_buf[4]) / 5;
+		k_brake_temp_avg = (k_brake_buf[0] + k_brake_buf[1] + k_brake_buf[2] + k_brake_buf[3] + k_brake_buf[4]) / 5;
+		strain_gauge_push_avg = (sg_push_buf[0] + sg_push_buf[1] + sg_push_buf[2] + sg_push_buf[3] + sg_push_buf[4]) / 5;
 
 		uint16_t strain_gauge_control  = get_strain_gauge_val(strain_gauge_control_avg);
 		uint16_t shock_angle = get_shock_angle(shock_angle_avg);
@@ -171,8 +138,6 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 		uint16_t ir_brake_temp = get_ir_brake_temp(ir_brake_temp_avg);
 		uint16_t k_brake_temp = get_k_brake_temp(k_brake_temp_avg);
 		uint16_t strain_gauge_push = get_strain_gauge_val(strain_gauge_push_avg);
-
-
 
 		//set the strain gauge UL data into the tx_data array
 		tx_data[0]= HI8(strain_gauge_uf);
@@ -199,8 +164,6 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 				break;
 
 		}
-
-
 
 		//then overwrite tx_data with control, push, and shock angle
 		tx_data[0]= HI8(strain_gauge_control);
@@ -248,7 +211,6 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 
 		}
 
-
 		//save most recent average to current average, might use it somewhere else?
 		strain_gauge_control_curr_avg = strain_gauge_control_avg;
 		shock_angle_curr_avg = shock_angle_avg;
@@ -270,7 +232,25 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 		ir_brake_temp_avg= 0;
 		k_brake_temp_avg = 0;
 		strain_gauge_push_avg = 0;
+		ready_to_send = 0;
+	}
+}
 
+// ISR called when ADC finishes conversion and DMA has written to ADC_RES_BUFFER
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
+	sg_control_buf[num_samples] = ADC_RES_BUFFER[0];
+	shock_ang_buf[num_samples] = ADC_RES_BUFFER[1];
+	sg_uf_buf[num_samples] = ADC_RES_BUFFER[2];
+	sg_ub_buf[num_samples] = ADC_RES_BUFFER[3];
+	sg_lf_buf[num_samples] = ADC_RES_BUFFER[4];
+	sg_lb_buf[num_samples] = ADC_RES_BUFFER[5];
+	ir_brake_buf[num_samples] = ADC_RES_BUFFER[6];
+	k_brake_buf[num_samples] = ADC_RES_BUFFER[7];
+	sg_push_buf[num_samples] = ADC_RES_BUFFER[8];
+	num_samples++;
+	if(num_samples == 5){
+		ready_to_send = 1;
+		num_samples = 0;
 	}
 }
 
