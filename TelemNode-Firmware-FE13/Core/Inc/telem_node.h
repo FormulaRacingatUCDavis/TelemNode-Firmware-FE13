@@ -10,6 +10,7 @@
 void TelemNode_Init();
 void TelemNode_Update();
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
+void Process_Average();
 
 uint16_t get_strain_gauge_val(uint64_t adc_val);
 
