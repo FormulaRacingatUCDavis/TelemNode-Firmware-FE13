@@ -66,9 +66,7 @@ static void MX_ADC1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-//Added this
-//initialize the buffer to be 9 since we have 9 channels
+//initialize buffer
 uint32_t ADC_RES_BUFFER[9];
 /* USER CODE END 0 */
 
