@@ -1,2 +1,0 @@
-../Core/Src/wheel_speed.c:11:6:WheelSpeed_Init	16	static
-../Core/Src/wheel_speed.c:18:10:WheelSpeed_GetCPS	32	static
