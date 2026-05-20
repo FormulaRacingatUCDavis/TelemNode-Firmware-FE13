@@ -17,9 +17,8 @@
 #define FAN_THRESH_2 500
 #define FAN_THRESH_3 600
 #define HYSTERESIS 30
-//might change this number later
 #define NUM_SAMPLES_IN_AVGERAGE 5
-//might take out switch bc only 2 but maybe keep if we get 4 nodes next year?
+
 TelemNodeLocation_t Location = FRONT;
 
 // HANDLE TYPE DEFS from main
@@ -55,11 +54,11 @@ uint8_t num_samples;
 //vars used to calculate avg
 uint64_t shock_angle_avg = 0;
 uint64_t wheel_speed_avg = 0;
+uint64_t brake_temp_avg = 0;
 
-uint64_t shock_angle_avg = 0;
+uint64_t shock_angle_current_avg = 0;
 uint64_t wheel_speed_current_avg = 0;
-
-
+uint64_t brake_temp_current_avg = 0;
 
 
 // PRIVATE FUNCTION PROTOTYPES
@@ -103,55 +102,47 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 
 	if( num_samples == 0){
 		//reading 1st set of samples
-		shock_angle = ADC_RES_BUFFER[0];
+		shock_angle_avg = ADC_RES_BUFFER[0];
 		wheel_speed_avg = ADC_RES_BUFFER[1];
+		brake_temp_avg = ADC_RES_BUFFER[2];
 
 		++num_samples;
 
 	}
 	else if (num_samples < NUM_SAMPLES_IN_AVGERAGE){
-		//calculating average for each sensor
-		//equation for new average = old average * (n-1)/n + new value/n
+
 		++num_samples;
 
-		ir_brake_temp_avg = ir_brake_temp_avg * (num_samples - 1) / num_samples + ADC_RES_BUFFER[0] / num_samples;
-		k_brake_temp_avg = k_brake_temp_avg * (num_samples - 1) / num_samples + ADC_RES_BUFFER[1] / num_samples;
-		wheel_speed_avg = wheel_speed_avg * (num_samples - 1)/ num_samples + ADC_RES_BUFFER[2]/num_samples;
+		shock_angle_avg = shock_angle_avg * (num_samples-1)/num_samples + ADC_RES_BUFFER[0]/num_samples;
+		wheel_speed_avg = wheel_speed_avg * (num_samples - 1)/ num_samples + ADC_RES_BUFFER[1]/num_samples;
+		brake_temp_avg = brake_temp_avg * (num_samples-1)/num_samples + ADC_RES_BUFFER[2]/num_samples;
 
 	}
 	else{
 
-		uint16_t ir_brake_temp = (uint16_t)ir_brake_temp_avg;
-		uint16_t k_brake_temp = (uint16_t)k_brake_temp_avg;
+		uint16_t shock_angle = (uint16_t)shock_angle_avg;
 		uint16_t wheel_speed = (uint16_t)wheel_speed_avg;
+		uint16_t brake_temp = (uint16_t)brake_temp_avg;
 
-		tx_data[0]= HI8(ir_brake_temp);
-		tx_data[1]= LO8(ir_brake_temp);
-		tx_data[2]= HI8(k_brake_temp);
-		tx_data[3]= LO8(k_brake_temp);
-		tx_data[4]= HI8(wheel_speed);
-		tx_data[5]= LO8(wheel_speed);
+		tx_data[0]= HI8(shock_angle);
+		tx_data[1]= LO8(shock_angle);
 
-		switch (Location) {
-			case (FRONT):
-				CAN_Send(IR_BRAKE_TEMP_UPPER,tx_data, 2);
-				CAN_Send(K_BRAKE_TEMP_UPPER,tx_data,2);
-				CAN_Send(WHEEL_SPEED_REAR,tx_data,2);
-				break;
-			case (REAR):
-				CAN_Send(IR_BRAKE_TEMP_UPPER,tx_data, 2);
-				CAN_Send(K_BRAKE_TEMP_UPPER,tx_data,2);
-				CAN_Send(WHEEL_SPEED_REAR,tx_data,2);
-				break;
-		}
-		//save most recent average to current average, might use it somewhere else?
-		ir_brake_temp_current_avg = ir_brake_temp_avg;
-		k_brake_temp_current_avg = k_brake_temp_avg;
+
+		tx_data[2]= HI8(wheel_speed);
+		tx_data[3]= LO8(wheel_speed);
+
+
+		tx_data[4]= HI8(brake_temp);
+		tx_data[5]= LO8(brake_temp);
+
+		shock_angle_current_avg = shock_angle_avg;
 		wheel_speed_current_avg = wheel_speed_avg;
+		brake_temp_current_avg = brake_temp_avg;
 
-		ir_brake_temp_avg= 0;
-		k_brake_temp_avg = 0;
+
+		shock_angle_avg = 0;
 		wheel_speed_avg = 0;
+		brake_temp_avg = 0;
 
 	}
 }
@@ -340,10 +331,10 @@ void set_fan_speed(uint8_t speed)
 // TODO dont use interrupts, see FE11-12 Dashboard code (use TIM)
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	switch(GPIO_Pin){
-		case GPIO_PIN_4:
+		case GPIO_PIN_0:
 			wheel_rr.count++;
 			break;
-		case GPIO_PIN_6:
+		case GPIO_PIN_8:
 			wheel_rl.count++;
 			break;
 	}

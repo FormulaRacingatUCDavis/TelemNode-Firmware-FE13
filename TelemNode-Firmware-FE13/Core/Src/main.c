@@ -107,7 +107,6 @@ int main(void)
 
   //ADDED this as well
   //signaling the start of the conversion
-  //9 bc we have 9 channels
   HAL_ADC_Start_DMA(&hadc1, ADC_RES_BUFFER, 9);
   TelemNode_Init();
 
@@ -271,7 +270,6 @@ static void MX_ADC1_Init(void)
 
   /** Configure Regular Channel
   */
-  sConfig.Channel = ADC_CHANNEL_8;
   sConfig.Rank = ADC_REGULAR_RANK_8;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
@@ -439,11 +437,11 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(HEARTBEAT_GPIO_Port, HEARTBEAT_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : EXTRA_SENSOR_Pin */
-  GPIO_InitStruct.Pin = EXTRA_SENSOR_Pin;
+  /*Configure GPIO pin : WHEEL_SPEED2_Pin */
+  GPIO_InitStruct.Pin = WHEEL_SPEED2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(EXTRA_SENSOR_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(WHEEL_SPEED2_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : HEARTBEAT_Pin */
   GPIO_InitStruct.Pin = HEARTBEAT_Pin;

@@ -113,11 +113,11 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     PB1     ------> ADC1_IN9
     */
     GPIO_InitStruct.Pin = STRAIN_GAUGE_CONTROL_Pin|SHOCK_ANGLE_Pin|STRAIN_GAUGE_UF_Pin|STRAIN_GAUGE_UB_Pin
-                          |STRAIN_GAUGE_LF_Pin|STRAIN_GAUGE_LB_Pin|IR_BRAKE_TEMP_Pin;
+                          |STRAIN_GAUGE_LF_Pin|STRAIN_GAUGE_LB_Pin|SHOCK_ANGLE2_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = K_BRAKE_TEMP_Pin|STRAIN_GAUGE_PUSH_Pin;
+    GPIO_InitStruct.Pin = BRAKE_TEMP_Pin|STRAIN_GAUGE_PUSH_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
@@ -177,9 +177,9 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
     PB1     ------> ADC1_IN9
     */
     HAL_GPIO_DeInit(GPIOA, STRAIN_GAUGE_CONTROL_Pin|SHOCK_ANGLE_Pin|STRAIN_GAUGE_UF_Pin|STRAIN_GAUGE_UB_Pin
-                          |STRAIN_GAUGE_LF_Pin|STRAIN_GAUGE_LB_Pin|IR_BRAKE_TEMP_Pin);
+                          |STRAIN_GAUGE_LF_Pin|STRAIN_GAUGE_LB_Pin|SHOCK_ANGLE2_Pin);
 
-    HAL_GPIO_DeInit(GPIOB, K_BRAKE_TEMP_Pin|STRAIN_GAUGE_PUSH_Pin);
+    HAL_GPIO_DeInit(GPIOB, BRAKE_TEMP_Pin|STRAIN_GAUGE_PUSH_Pin);
 
     /* ADC1 DMA DeInit */
     HAL_DMA_DeInit(hadc->DMA_Handle);

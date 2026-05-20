@@ -57,8 +57,8 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define EXTRA_SENSOR_Pin GPIO_PIN_0
-#define EXTRA_SENSOR_GPIO_Port GPIOA
+#define WHEEL_SPEED2_Pin GPIO_PIN_0
+#define WHEEL_SPEED2_GPIO_Port GPIOA
 #define STRAIN_GAUGE_CONTROL_Pin GPIO_PIN_1
 #define STRAIN_GAUGE_CONTROL_GPIO_Port GPIOA
 #define SHOCK_ANGLE_Pin GPIO_PIN_2
@@ -71,10 +71,10 @@ void Error_Handler(void);
 #define STRAIN_GAUGE_LF_GPIO_Port GPIOA
 #define STRAIN_GAUGE_LB_Pin GPIO_PIN_6
 #define STRAIN_GAUGE_LB_GPIO_Port GPIOA
-#define IR_BRAKE_TEMP_Pin GPIO_PIN_7
-#define IR_BRAKE_TEMP_GPIO_Port GPIOA
-#define K_BRAKE_TEMP_Pin GPIO_PIN_0
-#define K_BRAKE_TEMP_GPIO_Port GPIOB
+#define SHOCK_ANGLE2_Pin GPIO_PIN_7
+#define SHOCK_ANGLE2_GPIO_Port GPIOA
+#define BRAKE_TEMP_Pin GPIO_PIN_0
+#define BRAKE_TEMP_GPIO_Port GPIOB
 #define STRAIN_GAUGE_PUSH_Pin GPIO_PIN_1
 #define STRAIN_GAUGE_PUSH_GPIO_Port GPIOB
 #define HEARTBEAT_Pin GPIO_PIN_12
