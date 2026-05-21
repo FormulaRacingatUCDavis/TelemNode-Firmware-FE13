@@ -25,7 +25,7 @@ typedef enum {
 	MC_TEMPS_2 = 0xA1,
 	MC_TEMPS_3 = 0xA2,
 	COOLING_LOOP_TEMPS = 0x400,
-	WHEEL_SPEED_REAR = 0x401,
+//	WHEEL_SPEED_REAR = 0x401, // TODO should not be in PCAN anymore
 	COOLING_LOOP_PRESSURES = 0x402,
 	STRAIN_GAUGES_REAR = 0x403,
 	PUMP_PWM = 0x505,
@@ -54,15 +54,26 @@ typedef enum{
 	SG_CONTROLSHOCK_RL = 0x442,
 	SG_CONTROLSHOCK_RR = 0x443,
 
-	IR_BRAKE_TEMP_UPPER = 0x450,
-	IR_BRAKE_TEMP_LOWER = 0x451,
-	K_BRAKE_TEMP_UPPER = 0x452,
-	K_BRAKE_TEMP_LOWER = 0x453,
+//	IR_BRAKE_TEMP_UPPER = 0x450,
+//	IR_BRAKE_TEMP_LOWER = 0x451,
+//	K_BRAKE_TEMP_UPPER = 0x452,
+//	K_BRAKE_TEMP_LOWER = 0x453,
+
+	// for 5/22/26 Blue Max Track Day,
+	// only have two Telem Nodes
+	// each with 2 wheel speeds, 2 shock
+	// front Telem Node also has one brake temp
+	WHEEL_SPEEDS_FRONT = 0x460,
+	WHEEL_SPEEDS_REAR = 0x461,
+	SHOCK_ANGLES_FRONT = 0x464,
+	SHOCK_ANGLES_REAR = 0x465,
+	BRAKE_TEMP = 0x469,
+
 } TCAN_ID;
 
 typedef enum {
-	FRONT,
-	REAR,
+	LOCATION_FRONT,
+	LOCATION_REAR,
 } TelemNodeLocation_t;
 
 

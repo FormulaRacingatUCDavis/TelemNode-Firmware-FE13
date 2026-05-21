@@ -8,8 +8,8 @@
 #ifndef INC_CONFIG_H_
 #define INC_CONFIG_H_
 
-#define LOOP_PERIOD_MS 10
-#define SLOW_DIVIDER 50
+// number of loops to wait in between CAN sends
+#define CAN_LOOP_DELAY 10
 
 
 #endif /* INC_CONFIG_H_ */

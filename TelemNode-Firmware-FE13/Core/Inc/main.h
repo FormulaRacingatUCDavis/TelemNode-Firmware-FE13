@@ -59,33 +59,16 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define WHEEL_SPEED2_Pin GPIO_PIN_0
 #define WHEEL_SPEED2_GPIO_Port GPIOA
-#define STRAIN_GAUGE_CONTROL_Pin GPIO_PIN_1
-#define STRAIN_GAUGE_CONTROL_GPIO_Port GPIOA
-#define SHOCK_ANGLE_Pin GPIO_PIN_2
-#define SHOCK_ANGLE_GPIO_Port GPIOA
-#define STRAIN_GAUGE_UF_Pin GPIO_PIN_3
-#define STRAIN_GAUGE_UF_GPIO_Port GPIOA
-#define STRAIN_GAUGE_UB_Pin GPIO_PIN_4
-#define STRAIN_GAUGE_UB_GPIO_Port GPIOA
-#define STRAIN_GAUGE_LF_Pin GPIO_PIN_5
-#define STRAIN_GAUGE_LF_GPIO_Port GPIOA
-#define STRAIN_GAUGE_LB_Pin GPIO_PIN_6
-#define STRAIN_GAUGE_LB_GPIO_Port GPIOA
+#define SHOCK_ANGLE1_Pin GPIO_PIN_2
+#define SHOCK_ANGLE1_GPIO_Port GPIOA
 #define SHOCK_ANGLE2_Pin GPIO_PIN_7
 #define SHOCK_ANGLE2_GPIO_Port GPIOA
 #define BRAKE_TEMP_Pin GPIO_PIN_0
 #define BRAKE_TEMP_GPIO_Port GPIOB
-#define STRAIN_GAUGE_PUSH_Pin GPIO_PIN_1
-#define STRAIN_GAUGE_PUSH_GPIO_Port GPIOB
 #define HEARTBEAT_Pin GPIO_PIN_12
 #define HEARTBEAT_GPIO_Port GPIOB
-#define WHEEL_SPEED_Pin GPIO_PIN_8
-#define WHEEL_SPEED_GPIO_Port GPIOA
-#define WHEEL_1_Pin GPIO_PIN_4
-#define WHEEL_1_GPIO_Port GPIOB
-#define WHEEL_0_Pin GPIO_PIN_6
-#define WHEEL_0_GPIO_Port GPIOB
-#define WHEEL_0_EXTI_IRQn EXTI9_5_IRQn
+#define WHEEL_SPEED1_Pin GPIO_PIN_8
+#define WHEEL_SPEED1_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
 

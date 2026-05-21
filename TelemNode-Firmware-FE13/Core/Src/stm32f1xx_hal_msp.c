@@ -102,24 +102,17 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
     /**ADC1 GPIO Configuration
-    PA1     ------> ADC1_IN1
     PA2     ------> ADC1_IN2
-    PA3     ------> ADC1_IN3
-    PA4     ------> ADC1_IN4
-    PA5     ------> ADC1_IN5
-    PA6     ------> ADC1_IN6
     PA7     ------> ADC1_IN7
     PB0     ------> ADC1_IN8
-    PB1     ------> ADC1_IN9
     */
-    GPIO_InitStruct.Pin = STRAIN_GAUGE_CONTROL_Pin|SHOCK_ANGLE_Pin|STRAIN_GAUGE_UF_Pin|STRAIN_GAUGE_UB_Pin
-                          |STRAIN_GAUGE_LF_Pin|STRAIN_GAUGE_LB_Pin|SHOCK_ANGLE2_Pin;
+    GPIO_InitStruct.Pin = SHOCK_ANGLE1_Pin|SHOCK_ANGLE2_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = BRAKE_TEMP_Pin|STRAIN_GAUGE_PUSH_Pin;
+    GPIO_InitStruct.Pin = BRAKE_TEMP_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    HAL_GPIO_Init(BRAKE_TEMP_GPIO_Port, &GPIO_InitStruct);
 
     /* ADC1 DMA Init */
     /* ADC1 Init */
@@ -127,8 +120,8 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     hdma_adc1.Init.Direction = DMA_PERIPH_TO_MEMORY;
     hdma_adc1.Init.PeriphInc = DMA_PINC_DISABLE;
     hdma_adc1.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_adc1.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
-    hdma_adc1.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+    hdma_adc1.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+    hdma_adc1.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
     hdma_adc1.Init.Mode = DMA_CIRCULAR;
     hdma_adc1.Init.Priority = DMA_PRIORITY_LOW;
     if (HAL_DMA_Init(&hdma_adc1) != HAL_OK)
@@ -166,20 +159,13 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
     __HAL_RCC_ADC1_CLK_DISABLE();
 
     /**ADC1 GPIO Configuration
-    PA1     ------> ADC1_IN1
     PA2     ------> ADC1_IN2
-    PA3     ------> ADC1_IN3
-    PA4     ------> ADC1_IN4
-    PA5     ------> ADC1_IN5
-    PA6     ------> ADC1_IN6
     PA7     ------> ADC1_IN7
     PB0     ------> ADC1_IN8
-    PB1     ------> ADC1_IN9
     */
-    HAL_GPIO_DeInit(GPIOA, STRAIN_GAUGE_CONTROL_Pin|SHOCK_ANGLE_Pin|STRAIN_GAUGE_UF_Pin|STRAIN_GAUGE_UB_Pin
-                          |STRAIN_GAUGE_LF_Pin|STRAIN_GAUGE_LB_Pin|SHOCK_ANGLE2_Pin);
+    HAL_GPIO_DeInit(GPIOA, SHOCK_ANGLE1_Pin|SHOCK_ANGLE2_Pin);
 
-    HAL_GPIO_DeInit(GPIOB, BRAKE_TEMP_Pin|STRAIN_GAUGE_PUSH_Pin);
+    HAL_GPIO_DeInit(BRAKE_TEMP_GPIO_Port, BRAKE_TEMP_Pin);
 
     /* ADC1 DMA DeInit */
     HAL_DMA_DeInit(hadc->DMA_Handle);
@@ -228,8 +214,12 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* hcan)
     __HAL_AFIO_REMAP_CAN1_2();
 
     /* CAN1 interrupt Init */
+    HAL_NVIC_SetPriority(USB_HP_CAN1_TX_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(USB_HP_CAN1_TX_IRQn);
     HAL_NVIC_SetPriority(USB_LP_CAN1_RX0_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(USB_LP_CAN1_RX0_IRQn);
+    HAL_NVIC_SetPriority(CAN1_RX1_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(CAN1_RX1_IRQn);
     /* USER CODE BEGIN CAN1_MspInit 1 */
 
     /* USER CODE END CAN1_MspInit 1 */
@@ -261,7 +251,9 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* hcan)
     HAL_GPIO_DeInit(GPIOB, GPIO_PIN_8|GPIO_PIN_9);
 
     /* CAN1 interrupt DeInit */
+    HAL_NVIC_DisableIRQ(USB_HP_CAN1_TX_IRQn);
     HAL_NVIC_DisableIRQ(USB_LP_CAN1_RX0_IRQn);
+    HAL_NVIC_DisableIRQ(CAN1_RX1_IRQn);
     /* USER CODE BEGIN CAN1_MspDeInit 1 */
 
     /* USER CODE END CAN1_MspDeInit 1 */
@@ -277,7 +269,6 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* hcan)
   */
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
 {
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
   if(htim_base->Instance==TIM1)
   {
     /* USER CODE BEGIN TIM1_MspInit 0 */
@@ -285,16 +276,6 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
     /* USER CODE END TIM1_MspInit 0 */
     /* Peripheral clock enable */
     __HAL_RCC_TIM1_CLK_ENABLE();
-
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-    /**TIM1 GPIO Configuration
-    PA8     ------> TIM1_CH1
-    */
-    GPIO_InitStruct.Pin = WHEEL_SPEED_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(WHEEL_SPEED_GPIO_Port, &GPIO_InitStruct);
-
     /* USER CODE BEGIN TIM1_MspInit 1 */
 
     /* USER CODE END TIM1_MspInit 1 */
@@ -318,12 +299,6 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim_base)
     /* USER CODE END TIM1_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_TIM1_CLK_DISABLE();
-
-    /**TIM1 GPIO Configuration
-    PA8     ------> TIM1_CH1
-    */
-    HAL_GPIO_DeInit(WHEEL_SPEED_GPIO_Port, WHEEL_SPEED_Pin);
-
     /* USER CODE BEGIN TIM1_MspDeInit 1 */
 
     /* USER CODE END TIM1_MspDeInit 1 */
