@@ -83,6 +83,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 		shock_angle2_avg = 0;
 		brake_temp_avg = 0;
 
+		num_samples = 0;
 	}
 }
 
