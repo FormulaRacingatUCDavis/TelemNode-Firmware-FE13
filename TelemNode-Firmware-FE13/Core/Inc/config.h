@@ -8,8 +8,10 @@
 #ifndef INC_CONFIG_H_
 #define INC_CONFIG_H_
 
-// number of loops to wait in between CAN sends
-#define CAN_LOOP_DELAY 10
+// assuming PSC = 7199, one tick is 0.1 ms
+// 	e.g. 1000 timer ticks * 0.1ms = 100ms
+// 	so we would send CAN at a max of 10 Hz
+#define CAN_DELAY_TICKS 1000
 
 
 #endif /* INC_CONFIG_H_ */

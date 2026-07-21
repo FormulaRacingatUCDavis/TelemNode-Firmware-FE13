@@ -43,6 +43,8 @@ int16_t get_temp(uint16_t adc_val);
 int16_t get_air_temp(uint16_t adc_val);
 //uint16_t set_to_16(uint64_t adc_val);
 
+uint8_t CAN_SEND_FLAG = 0;
+
 void TelemNode_Init(){
 	CAN_Init();
 
@@ -92,11 +94,7 @@ void TelemNode_Update()
 	static uint8_t loop_count = 0;
 	static uint8_t tx_data[8] = {0};
 
-	loop_count++;
-	if(loop_count <= CAN_LOOP_DELAY) return;
-	loop_count = 0;
-	// NOTE: can send at reduced frequency if CAN traffic too high
-	// see config.h to tune CAN_LOOP_DELAY
+	if (CAN_SEND_FLAG != 1) return; // check for flag from TIM2 CH3 interrupt
 
 	// brake temp
 	// for 5/22/26 track day, only front Telem Node has brake temp, and only has 1
@@ -132,6 +130,8 @@ void TelemNode_Update()
 		CAN_Send(WHEEL_SPEEDS_REAR, tx_data, 4);
 	}
 
+	CAN_SEND_FLAG = 0; // reset the flag
+
 }
 
 //uint16_t set_to_16(uint64_t adc_val){
@@ -148,6 +148,26 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 			wheel_2.count++;
 			break;
 	}
+}
+
+void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim)
+{
+    if (htim->Instance == TIM2)
+    {
+        if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3) // TIM2 CH3 is for CAN
+        {
+        	// use the current timer count to calculate the next time to have this channel interrupt
+            uint32_t current_count = __HAL_TIM_GET_COUNTER(htim);
+
+            // see config.h for explanation of CAN delay
+            __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_3, current_count + CAN_DELAY_TICKS);
+
+           // this code runs at the frequency set above
+           if (CAN_SEND_FLAG == 0) {
+        	   CAN_SEND_FLAG = 1; // set the flag to signal that we should send CAN
+           }
+        }
+    }
 }
 
 
