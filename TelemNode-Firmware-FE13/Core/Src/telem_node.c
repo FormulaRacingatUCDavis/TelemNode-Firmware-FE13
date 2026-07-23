@@ -157,7 +157,7 @@ void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim)
         if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3) // TIM2 CH3 is for CAN
         {
         	// use the current timer count to calculate the next time to have this channel interrupt
-            uint32_t current_count = __HAL_TIM_GET_COUNTER(htim);
+            uint16_t current_count = __HAL_TIM_GET_COUNTER(htim);
 
             // see config.h for explanation of CAN delay
             __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_3, current_count + CAN_DELAY_TICKS);
