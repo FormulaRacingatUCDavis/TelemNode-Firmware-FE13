@@ -383,7 +383,6 @@ static void MX_TIM2_Init(void)
   {
     Error_Handler();
   }
-  sConfigOC.Pulse = 0;
   if (HAL_TIM_OC_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
   {
     Error_Handler();
