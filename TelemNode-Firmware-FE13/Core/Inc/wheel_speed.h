@@ -14,11 +14,12 @@
 typedef struct
 {
 	uint32_t last_tick;
-	uint32_t last_count;
-	uint32_t count;
+	uint16_t last_count;
+	uint16_t count;
+	TIM_HandleTypeDef* tim;
 } WheelSpeed_t;
 
-void WheelSpeed_Init(WheelSpeed_t* ws);
+void WheelSpeed_Init(WheelSpeed_t* ws, TIM_HandleTypeDef* tm);
 uint32_t WheelSpeed_GetCPS(WheelSpeed_t* ws);
 
 #endif /* INC_WHEEL_SPEED_H_ */

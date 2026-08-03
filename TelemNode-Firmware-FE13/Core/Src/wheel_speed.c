@@ -8,17 +8,20 @@
 
 #include "wheel_speed.h"
 
-void WheelSpeed_Init(WheelSpeed_t* ws)
+void WheelSpeed_Init(WheelSpeed_t* ws, TIM_HandleTypeDef* tm)
 {
 	ws->last_count = 0;
 	ws->count = 0;
 	ws->last_tick = HAL_GetTick();
+	ws->tim = tm;
 }
 // Hello
 uint32_t WheelSpeed_GetCPS(WheelSpeed_t* ws)
 {
 	uint32_t tick = HAL_GetTick();
 	uint32_t dif = (tick - ws->last_tick);
+
+	ws->count = __HAL_TIM_GET_COUNTER(ws->tim);
 
 	// prevent divide by 0
 	if(dif == 0) dif = 1;

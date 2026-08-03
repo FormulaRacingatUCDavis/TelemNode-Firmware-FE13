@@ -18,6 +18,8 @@ TelemNodeLocation_t location = LOCATION_FRONT;
 // HANDLE TYPE DEFS from main
 extern ADC_HandleTypeDef hadc1;
 extern uint16_t ADC_RES_BUFFER[3];
+extern TIM_HandleTypeDef htim1;
+extern TIM_HandleTypeDef htim2;
 
 // PRIVATE GLOBALS
 WheelSpeed_t wheel_1;
@@ -48,8 +50,8 @@ uint8_t CAN_SEND_FLAG = 0;
 void TelemNode_Init(){
 	CAN_Init();
 
-	WheelSpeed_Init(&wheel_1);
-	WheelSpeed_Init(&wheel_2);
+	WheelSpeed_Init(&wheel_1, &htim1);
+	WheelSpeed_Init(&wheel_2, &htim2);
 }
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
@@ -138,17 +140,17 @@ void TelemNode_Update()
 //	return (uint16_t)adc_val;
 //}
 
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
-	switch(GPIO_Pin){
-		case WHEEL_SPEED1_Pin:
-			wheel_1.count++;
-			break;
-		case WHEEL_SPEED2_Pin:
-			wheel_2.count++;
-			break;
-	}
-}
+// no longer used since wheel speed is calculated with timers, not interrupts
+//void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+//	switch(GPIO_Pin){
+//		case WHEEL_SPEED1_Pin:
+//			wheel_1.count++;
+//			break;
+//		case WHEEL_SPEED2_Pin:
+//			wheel_2.count++;
+//			break;
+//	}
+//}
 
 void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim)
 {
