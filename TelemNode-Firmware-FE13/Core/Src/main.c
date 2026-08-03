@@ -116,7 +116,7 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
-  HAL_TIM_OC_Start_IT(&htim2, TIM_CHANNEL_3); // TIM2 CH3 used for CAN timing
+  HAL_TIM_OC_Start_IT(&htim3, TIM_CHANNEL_1); // TIM2 CH3 used for CAN timing
 
   //signaling the start of the conversion
   HAL_ADC_Start_DMA(&hadc1, ADC_RES_BUFFER, 3);
