@@ -118,10 +118,8 @@ int main(void)
 
   HAL_TIM_Base_Start(&htim1); // TIM1 used for WHEEL_SPEED1
   HAL_TIM_Base_Start(&htim2); // TIM2 used for WHEEL_SPEED2
-  HAL_TIM_OC_Start_IT(&htim3, TIM_CHANNEL_1); // TIM2 CH3 used for CAN timing
+  HAL_TIM_OC_Start_IT(&htim3, TIM_CHANNEL_1); // TIM2 CH3 used for sensor timing
 
-  //signaling the start of the conversion
-  HAL_ADC_Start_DMA(&hadc1, ADC_RES_BUFFER, 3);
 
   TelemNode_Init();
 
@@ -132,6 +130,31 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  // update the ADC readings
+	  for (int i = 0; i < NUM_ADC_CHANNELS; i++) {
+
+		  if (adc_channels[i].flag == 1) {
+			  // prepare new conversion settings
+			  ADC_ChannelConfTypeDef sConfig = {0};
+			  sConfig.Channel = adc_channels[i].channel_number;
+			  sConfig.Rank = 1; // always Rank 1 since Scan Mode is Disabled
+			  sConfig.SamplingTime = ADC_SAMPLETIME_55CYCLES_5;
+			  HAL_ADC_ConfigChannel(&hadc1, &sConfig);
+
+              //cycle the ADC State Machine to apply settings
+              HAL_ADC_Start(&hadc1);
+
+              // block for ~5 microseconds until conversion finishes
+              if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK) {
+                  adc_channels[i].adc_value = HAL_ADC_GetValue(&hadc1); // save the fresh data
+              }
+
+              HAL_ADC_Stop(&hadc1); // turn off state machine until next flag hits
+		  }
+
+	  }
+
+	  // send sensor readings over CAN
 	  TelemNode_Update();
 
 	  HAL_GPIO_TogglePin(HEARTBEAT_GPIO_Port, HEARTBEAT_Pin);
