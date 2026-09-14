@@ -93,10 +93,9 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 
 void TelemNode_Update()
 {
-	static uint8_t loop_count = 0;
 	static uint8_t tx_data[8] = {0};
 
-	if (CAN_SEND_FLAG != 1) return; // check for flag from TIM2 CH3 interrupt
+	if (CAN_SEND_FLAG != 1) return; // check for flag from TIM3 CH1 interrupt
 
 	// brake temp
 	// for 5/22/26 track day, only front Telem Node has brake temp, and only has 1
